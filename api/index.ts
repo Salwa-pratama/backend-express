@@ -1,12 +1,10 @@
+// api/index.ts
 import app from "../src/app";
 import serverless from "serverless-http";
 
-console.log("🚀 Loading serverless handler...");
+console.log("🚀 Initializing Vercel serverless function...");
 
-// Wrap Express app dengan serverless-http
-console.log("🔄 Wrapping Express app with serverless-http...");
+// ✅ GUNAKAN DEFAULT EXPORT, BUKAN NAMED EXPORT!
+export default serverless(app);
 
-// Export harus di top-level, gak bisa di dalam try-catch!
-export const handler = serverless(app);
-
-console.log("✅ Handler created successfully!");
+console.log("✅ Serverless function ready!");
