@@ -1,27 +1,31 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { supabase } from "./db/supabase";
+
+console.log("🚀 Initializing Express app...");
 
 const app = express();
 
-// Middleware
-app.use(
-  cors({
-    origin: "*", // Bisa diganti dengan domain spesifik nanti
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
-app.use(express.json());
+console.log("✅ Express app created");
 
-// 🛡️ Middleware: Pastikan semua response punya Content-Type JSON
+// Error handling middleware - MUST be first
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  console.log(`📍 Incoming request: ${req.method} ${req.path}`);
   next();
 });
 
-// 🏥 Health Check - GUNAKAN res.json(), BUKAN res.send()
+// Middleware
+try {
+  console.log("🔄 Setting up middleware...");
+  app.use(cors());
+  app.use(express.json());
+  console.log("✅ Middleware configured");
+} catch (error: any) {
+  console.error("❌ Error setting up middleware:", error.message);
+}
+
+// Health Check
 app.get("/", (req: Request, res: Response) => {
+  console.log("✅ Health check endpoint hit");
   res.json({
     status: "ok",
     message: "API is running on Vercel! 🚀",
@@ -29,68 +33,46 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// ✅ Route: Get Todos
-app.get("/api/todos", async (req: Request, res: Response) => {
+// Test Supabase route
+app.get("/api/test-db", async (req: Request, res: Response) => {
+  console.log("🔄 Testing Supabase connection...");
   try {
-    const { data, error } = await supabase.from("todos").select("*");
+    const { supabase } = await import("./db/supabase");
+    const { data, error } = await supabase.from("todos").select("*").limit(1);
 
-    if (error) throw error;
-
-    res.status(200).json({ success: true, data });
-  } catch (error: any) {
-    console.error("Error fetching todos:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Internal server error",
-    });
-  }
-});
-
-// ✅ Route: Create Todo
-app.post("/api/todos", async (req: Request, res: Response) => {
-  try {
-    const { title } = req.body;
-
-    if (!title) {
-      return res.status(400).json({
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      return res.status(500).json({
         success: false,
-        message: "Title is required",
+        message: "Supabase error",
+        error: error.message,
       });
     }
 
-    const { data, error } = await supabase
-      .from("todos")
-      .insert([{ title }])
-      .select();
-
-    if (error) throw error;
-
-    res.status(201).json({ success: true, data });
+    console.log("✅ Supabase connection successful!");
+    res.json({ success: true, message: "Supabase connected!", data });
   } catch (error: any) {
-    console.error("Error creating todo:", error);
+    console.error("❌ Test DB error:", error);
     res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: error.message,
     });
   }
 });
 
-// 🔄 Handle 404 - Biar gak return HTML default Express
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.method} ${req.path} not found`,
-  });
-});
+// ... route lainnya (todos, dll)
 
-// 🐛 Error Handler Global
+// Global error handler - MUST be last
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Unhandled error:", err);
+  console.error("💥 UNHANDLED ERROR:", err);
+  console.error("💥 Stack:", err.stack);
   res.status(500).json({
     success: false,
-    message: "Something went wrong!",
+    message: "Internal server error",
     error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
+
+console.log("✅ Express app initialization complete!");
 
 export default app;
