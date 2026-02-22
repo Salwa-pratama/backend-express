@@ -34,7 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Test Supabase route
-app.get("/api/test-db", async (req: Request, res: Response) => {
+app.get("/test-db", async (req: Request, res: Response) => {
   console.log("🔄 Testing Supabase connection...");
   try {
     const { supabase } = await import("./db/supabase");
