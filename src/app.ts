@@ -37,7 +37,7 @@ app.get("/", (req: Request, res: Response) => {
 app.get("/test-db", async (req: Request, res: Response) => {
   console.log("🔄 Testing Supabase connection...");
   try {
-    const { supabase } = await import("./db/supabase");
+    const { supabase } = await import("./database/supabase");
     const { data, error } = await supabase.from("todos").select("*").limit(1);
 
     if (error) {

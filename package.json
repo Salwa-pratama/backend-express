@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./api/index.ts",
-    
     "build": "echo 'skip build'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/api/index.js"
@@ -14,10 +13,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^7.4.1",
     "@supabase/supabase-js": "^2.97.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "prisma": "^7.4.1",
     "serverless-http": "^4.0.0"
   },
   "devDependencies": {

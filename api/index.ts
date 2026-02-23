@@ -4,7 +4,6 @@ import serverless from "serverless-http";
 
 console.log("🚀 Initializing Vercel serverless function...");
 
-
 export default serverless(app);
 
 console.log("✅ Serverless function ready!");
