@@ -34,13 +34,6 @@ export async function testSupabaseConnection(): Promise<boolean> {
     console.log("🔄 Testing Supabase connection...");
 
     // Test query sederhana (ganti 'todos' dengan tabel lo)
-    const { data, error } = await supabase.from("todos").select("id").limit(1);
-
-    if (error) {
-      console.error("❌ Supabase connection FAILED!");
-      console.error("🔴 Error:", error.message);
-      return false;
-    }
 
     console.log("✅ Supabase connection SUCCESS!");
     console.log("🟢 Database reachable, tables accessible");

@@ -114,8 +114,9 @@ export class AuthService {
         refreshToken,
       });
     } catch (error) {
+      console.log("error : ", error);
       return ServiceResponse.failure(
-        "An error occurred while logging in.",
+        `An error occurred while logging in. Error : ${error}`,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );
