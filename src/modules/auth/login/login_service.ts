@@ -8,7 +8,10 @@ import type {
   RegisterRequest,
   UserResponse,
 } from "./login_dto";
-import { ServiceResponse } from "@/common/models/serviceResponse";
+import {
+  ServiceResponse,
+  ServiceResponseSchema,
+} from "@/common/models/ServiceResponse";
 
 export class AuthService {
   constructor(
@@ -33,17 +36,13 @@ export class AuthService {
   private generateTokens(userId: number, email: string, role: string) {
     const payload = { userId, email, role };
 
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
-      expiresIn: process.env.JWT_ACCESS_EXPIRY ?? "15m",
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+      expiresIn: (process.env.JWT_ACCESS_EXPIRY ?? "15m") as any,
     });
 
-    const refreshToken = jwt.sign(
-      payload,
-      process.env.JWT_REFRESH_SECRET as string,
-      {
-        expiresIn: process.env.JWT_REFRESH_EXPIRY ?? "7d",
-      },
-    );
+    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
+      expiresIn: (process.env.JWT_REFRESH_EXPIRY ?? "7d") as any,
+    });
 
     return { accessToken, refreshToken };
   }
@@ -52,11 +51,11 @@ export class AuthService {
 
   async registerAsync(
     payload: RegisterRequest,
-  ): Promise<ServiceResponse<UserResponse | null>> {
+  ): Promise<ServiceResponseSchema<UserResponse | null>> {
     try {
       const existing = await this.repository.findByEmailAsync(payload.email);
       if (existing) {
-        return ServiceResponse.failure(
+        return ServiceResponse.success(
           "Email already in use",
           null,
           StatusCodes.BAD_REQUEST,
@@ -68,7 +67,6 @@ export class AuthService {
         name: payload.name,
         passwordHash: this.hashPassword(payload.password),
         role: "USER",
-        phone: null,
         refreshTokenHash: null,
       });
 
@@ -88,7 +86,7 @@ export class AuthService {
 
   async loginAsync(
     payload: LoginRequest,
-  ): Promise<ServiceResponse<LoginResponse | null>> {
+  ): Promise<ServiceResponseSchema<LoginResponse | null>> {
     try {
       const user = await this.repository.findByEmailAsync(payload.email);
       if (!user || !this.verifyPassword(payload.password, user.passwordHash)) {
@@ -124,7 +122,7 @@ export class AuthService {
     }
   }
 
-  async logoutAsync(userId: number): Promise<ServiceResponse<null>> {
+  async logoutAsync(userId: number): Promise<ServiceResponseSchema<null>> {
     try {
       await this.repository.clearRefreshTokenAsync(userId);
       return ServiceResponse.success("Logout successful", null);

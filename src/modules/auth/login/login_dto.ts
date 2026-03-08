@@ -26,7 +26,7 @@ export const UserResponseSchema = z.object({
   updatedAt: z.date(),
 });
 
-export const LoginResponseSchema = z.object({
+export const LoginDataSchma = z.object({
   user: UserResponseSchema,
   accessToken: z.string(),
   refreshToken: z.string(),
@@ -36,4 +36,4 @@ export const LoginResponseSchema = z.object({
 export type LoginRequest = z.infer<typeof LoginRequestSchema>["body"];
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>["body"];
 export type UserResponse = z.infer<typeof UserResponseSchema>;
-export type LoginResponse = z.infer<typeof LoginResponseSchema>;
+export type LoginResponse = z.infer<typeof LoginDataSchma>;
