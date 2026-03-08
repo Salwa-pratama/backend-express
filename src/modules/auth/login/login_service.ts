@@ -11,7 +11,7 @@ import type {
 import {
   ServiceResponse,
   ServiceResponseSchema,
-} from "@/common/models/ServiceResponse";
+} from "@/common/models/service_response";
 
 export class AuthService {
   constructor(
