@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import { authRouter } from "./modules/auth/login/login_router";
 
 console.log("🚀 Initializing Express app...");
 
@@ -33,46 +34,7 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// Test Supabase route
-app.get("/test-db", async (req: Request, res: Response) => {
-  console.log("🔄 Testing Supabase connection...");
-  try {
-    const { supabase } = await import("./database/supabase");
-    const { data, error } = await supabase.from("todos").select("*").limit(1);
-
-    if (error) {
-      console.error("❌ Supabase error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Supabase error",
-        error: error.message,
-      });
-    }
-
-    console.log("✅ Supabase connection successful!");
-    res.json({ success: true, message: "Supabase connected!", data });
-  } catch (error: any) {
-    console.error("❌ Test DB error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// ... route lainnya (todos, dll)
-
-// Global error handler - MUST be last
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("💥 UNHANDLED ERROR:", err);
-  console.error("💥 Stack:", err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Internal server error",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
-
+app.use("/api/auth", authRouter);
 console.log("✅ Express app initialization complete!");
 
 export default app;
